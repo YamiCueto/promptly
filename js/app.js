@@ -4,6 +4,7 @@ class AppManager {
         this.settings = {};
         this.isSettingsOpen = false;
         this.elements = {};
+        this.wizard = null;
         
         this.init();
     }
@@ -20,6 +21,9 @@ class AppManager {
         
         // Cargar configuración guardada
         this.loadSettings();
+        
+        // Verificar si es la primera vez
+        this.checkFirstTime();
         
         // Inicializar UI
         this.initializeUI();
@@ -560,6 +564,20 @@ class AppManager {
         
         // Configurar proveedor inicial
         aiProviders.setProvider(this.settings.provider, this.settings);
+    }
+    
+    checkFirstTime() {
+        const hasCompletedSetup = Utils.loadFromStorage('promptly_setup_completed', false);
+        
+        if (!hasCompletedSetup) {
+            // Es la primera vez, mostrar wizard
+            this.showSetupWizard();
+        }
+    }
+    
+    showSetupWizard() {
+        this.wizard = new SetupWizard(this);
+        this.wizard.show();
     }
     
     toggleSettings() {

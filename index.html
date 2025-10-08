@@ -179,10 +179,191 @@
         <p>Enviando mensaje...</p>
     </div>
 
+    <!-- Setup Wizard -->
+    <div class="setup-wizard hidden" id="setupWizard">
+        <div class="wizard-backdrop"></div>
+        <div class="wizard-container">
+            <div class="wizard-header">
+                <h2 id="wizardTitle">🧙‍♂️ Configuración Inicial de Promptly</h2>
+                <div class="wizard-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="wizardProgress"></div>
+                    </div>
+                    <span class="progress-text" id="wizardProgressText">Paso 1 de 4</span>
+                </div>
+            </div>
+            
+            <div class="wizard-content">
+                <!-- Step 1: Welcome -->
+                <div class="wizard-step active" data-step="1">
+                    <div class="step-icon">🚀</div>
+                    <h3>¡Bienvenido a Promptly!</h3>
+                    <p>Te guiaré a través de la configuración inicial para que puedas comenzar a chatear con IA de inmediato.</p>
+                    <div class="feature-highlights">
+                        <div class="highlight">
+                            <span class="material-icons">psychology</span>
+                            <span>Conecta con Ollama local o APIs externas</span>
+                        </div>
+                        <div class="highlight">
+                            <span class="material-icons">auto_awesome</span>
+                            <span>Auto-scroll inteligente y tema personalizable</span>
+                        </div>
+                        <div class="highlight">
+                            <span class="material-icons">speed</span>
+                            <span>Interfaz rápida y responsive</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Provider Selection -->
+                <div class="wizard-step" data-step="2">
+                    <div class="step-icon">🔌</div>
+                    <h3>Selecciona tu Proveedor de IA</h3>
+                    <p>¿Cómo quieres conectarte a los modelos de IA?</p>
+                    <div class="provider-options">
+                        <div class="provider-card" data-provider="ollama">
+                            <div class="provider-icon">🏠</div>
+                            <h4>Ollama Local</h4>
+                            <p>Ejecuta modelos en tu computadora</p>
+                            <ul>
+                                <li>✅ Privado y seguro</li>
+                                <li>✅ Sin límites de uso</li>
+                                <li>✅ Funciona offline</li>
+                                <li>⚠️ Requiere instalación</li>
+                            </ul>
+                        </div>
+                        <div class="provider-card" data-provider="external">
+                            <div class="provider-icon">☁️</div>
+                            <h4>APIs Externas</h4>
+                            <p>Conecta con OpenAI, Anthropic, Groq</p>
+                            <ul>
+                                <li>✅ Configuración rápida</li>
+                                <li>✅ Modelos más potentes</li>
+                                <li>✅ Siempre actualizado</li>
+                                <li>⚠️ Requiere API key</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3a: Ollama Configuration -->
+                <div class="wizard-step" data-step="3" data-provider="ollama">
+                    <div class="step-icon">⚙️</div>
+                    <h3>Configuración de Ollama</h3>
+                    <p>Vamos a conectar con tu instalación local de Ollama.</p>
+                    
+                    <div class="config-section">
+                        <label for="wizardOllamaUrl">URL de Ollama:</label>
+                        <input type="text" id="wizardOllamaUrl" class="wizard-input" value="http://localhost:11434" placeholder="http://localhost:11434">
+                        <small>Normalmente es localhost:11434 si tienes Ollama instalado localmente</small>
+                    </div>
+
+                    <div class="ollama-status" id="ollamaWizardStatus">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Haz clic en "Probar Conexión" para verificar</span>
+                    </div>
+
+                    <button type="button" class="btn-primary" id="testOllamaConnection">
+                        <span class="material-icons">wifi_find</span>
+                        Probar Conexión
+                    </button>
+
+                    <div class="ollama-help hidden" id="ollamaHelp">
+                        <h4>💡 ¿No tienes Ollama instalado?</h4>
+                        <ol>
+                            <li>Descarga Ollama desde <a href="https://ollama.ai" target="_blank">ollama.ai</a></li>
+                            <li>Instálalo en tu sistema</li>
+                            <li>Ejecuta: <code>ollama pull llama3.2</code></li>
+                            <li>Inicia el servidor: <code>ollama serve</code></li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Step 3b: External API Configuration -->
+                <div class="wizard-step" data-step="3" data-provider="external">
+                    <div class="step-icon">🔑</div>
+                    <h3>Configuración de API Externa</h3>
+                    <p>Selecciona tu proveedor de IA preferido y configura tu API key.</p>
+                    
+                    <div class="config-section">
+                        <label for="wizardApiProvider">Proveedor:</label>
+                        <select id="wizardApiProvider" class="wizard-input">
+                            <option value="openai">OpenAI (GPT-4, GPT-3.5)</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="groq">Groq (Llama, Mixtral)</option>
+                        </select>
+                    </div>
+
+                    <div class="config-section">
+                        <label for="wizardApiKey">API Key:</label>
+                        <input type="password" id="wizardApiKey" class="wizard-input" placeholder="sk-...">
+                        <small>Tu API key se almacena localmente en tu navegador</small>
+                    </div>
+
+                    <div class="api-links">
+                        <h4>🔗 Obtener API Keys:</h4>
+                        <div class="link-grid">
+                            <a href="https://platform.openai.com/api-keys" target="_blank" class="api-link">
+                                <span class="material-icons">launch</span>
+                                OpenAI API Keys
+                            </a>
+                            <a href="https://console.anthropic.com/" target="_blank" class="api-link">
+                                <span class="material-icons">launch</span>
+                                Anthropic Console
+                            </a>
+                            <a href="https://console.groq.com/keys" target="_blank" class="api-link">
+                                <span class="material-icons">launch</span>
+                                Groq API Keys
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Completion -->
+                <div class="wizard-step" data-step="4">
+                    <div class="step-icon">🎉</div>
+                    <h3>¡Configuración Completada!</h3>
+                    <p>Todo está listo para comenzar a usar Promptly.</p>
+                    
+                    <div class="completion-summary" id="completionSummary">
+                        <!-- Se llena dinámicamente con la configuración -->
+                    </div>
+
+                    <div class="next-steps">
+                        <h4>📋 Próximos pasos:</h4>
+                        <ul>
+                            <li>✨ Escribir tu primer mensaje en el chat</li>
+                            <li>🎨 Personalizar el tema (claro/oscuro)</li>
+                            <li>📤 Exportar conversaciones cuando quieras</li>
+                            <li>⚙️ Cambiar configuración desde el panel lateral</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="wizard-footer">
+                <button type="button" class="btn-secondary" id="wizardBack" disabled>
+                    <span class="material-icons">arrow_back</span>
+                    Anterior
+                </button>
+                <button type="button" class="btn-primary" id="wizardNext">
+                    Siguiente
+                    <span class="material-icons">arrow_forward</span>
+                </button>
+                <button type="button" class="btn-primary hidden" id="wizardFinish">
+                    <span class="material-icons">check</span>
+                    ¡Empezar a Chatear!
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
     <script src="js/providers.js"></script>
     <script src="js/chat.js"></script>
+    <script src="js/wizard.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
