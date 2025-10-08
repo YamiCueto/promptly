@@ -31,6 +31,7 @@ class AppManager {
             settingsBtn: document.getElementById('settingsBtn'),
             clearChatBtn: document.getElementById('clearChatBtn'),
             exportChatBtn: document.getElementById('exportChatBtn'),
+            headerModelSelect: document.getElementById('headerModelSelect'),
             
             // Settings Panel
             settingsPanel: document.getElementById('settingsPanel'),
@@ -60,6 +61,11 @@ class AppManager {
         this.elements.settingsBtn?.addEventListener('click', () => this.toggleSettings());
         this.elements.clearChatBtn?.addEventListener('click', () => this.clearChat());
         this.elements.exportChatBtn?.addEventListener('click', () => this.exportChat());
+        
+        // Header model selector
+        this.elements.headerModelSelect?.addEventListener('change', (e) => {
+            this.handleHeaderModelChange(e.target.value);
+        });
         
         // Settings panel
         this.elements.closeSettingsBtn?.addEventListener('click', () => this.closeSettings());
@@ -133,6 +139,9 @@ class AppManager {
         // Actualizar valores en la UI
         this.updateUIFromSettings();
         
+        // Inicializar selector del header
+        this.updateHeaderModelSelector();
+        
         // Actualizar estado de conexión
         this.updateConnectionStatus();
     }
@@ -153,6 +162,69 @@ class AppManager {
         }
         
         this.updateConnectionStatus();
+    }
+    
+    handleHeaderModelChange(selectedValue) {
+        // Extraer el modelo y proveedor del valor seleccionado
+        const [model, provider] = this.parseHeaderModelValue(selectedValue);
+        
+        // Actualizar settings
+        this.settings.model = model;
+        if (provider) {
+            this.settings.provider = provider;
+            
+            // Actualizar el selector de proveedor en settings
+            if (this.elements.providerSelect) {
+                this.elements.providerSelect.value = provider;
+            }
+            
+            // Actualizar las configuraciones visibles
+            this.handleProviderChange(provider);
+        }
+        
+        // Actualizar el modelo en el selector correspondiente
+        if (this.settings.provider === 'ollama') {
+            if (this.elements.ollamaModel) {
+                this.elements.ollamaModel.value = model;
+            }
+        } else {
+            if (this.elements.apiModel) {
+                this.elements.apiModel.value = model;
+            }
+        }
+        
+        // Guardar configuración
+        this.saveSettings();
+        
+        // Actualizar estado de conexión
+        this.updateConnectionStatus();
+        
+        // Mostrar notificación
+        this.showNotification(`Modelo cambiado a: ${model}`, 'success');
+    }
+    
+    parseHeaderModelValue(value) {
+        // Si el valor contiene paréntesis, extraer el proveedor
+        const match = value.match(/^(.+?)\s*\((.+?)\)$/);
+        if (match) {
+            const model = match[1].trim();
+            const providerText = match[2].trim().toLowerCase();
+            
+            // Mapear el texto del proveedor
+            const providerMap = {
+                'ollama': 'ollama',
+                'openai': 'openai',
+                'anthropic': 'anthropic',
+                'claude': 'anthropic',
+                'groq': 'groq'
+            };
+            
+            const provider = providerMap[providerText] || 'ollama';
+            return [model, provider];
+        }
+        
+        // Si no hay paréntesis, asumir que es Ollama
+        return [value, 'ollama'];
     }
     
     updateApiModels(provider) {
@@ -214,6 +286,9 @@ class AppManager {
             }
             
             this.updateConnectionStatus();
+            
+            // Actualizar el selector del header
+            this.updateHeaderModelSelector();
         } catch (error) {
             console.error('Error actualizando modelos:', error);
             this.showNotification('Error al actualizar modelos de Ollama', 'error');
@@ -227,6 +302,75 @@ class AppManager {
         // Notificación de éxito si se encontraron modelos
         if (models && models.length > 0) {
             this.showNotification(`${models.length} modelos encontrados`, 'success', 2000);
+        }
+    }
+    
+    updateHeaderModelSelector() {
+        const headerSelect = this.elements.headerModelSelect;
+        if (!headerSelect) return;
+        
+        const currentValue = headerSelect.value;
+        headerSelect.innerHTML = '';
+        
+        // Agregar modelos de Ollama
+        const ollamaModels = this.getAvailableOllamaModels();
+        if (ollamaModels.length > 0) {
+            ollamaModels.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = `${model} (Ollama)`;
+                headerSelect.appendChild(option);
+            });
+        }
+        
+        // Agregar modelos de APIs externas
+        const providers = ['openai', 'anthropic', 'groq'];
+        providers.forEach(provider => {
+            const models = aiProviders.getModelsForProvider(provider);
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = `${model} (${provider})`;
+                option.textContent = `${model} (${provider.charAt(0).toUpperCase() + provider.slice(1)})`;
+                headerSelect.appendChild(option);
+            });
+        });
+        
+        // Restaurar selección si es posible
+        this.syncHeaderModelSelector();
+    }
+    
+    getAvailableOllamaModels() {
+        const ollamaSelect = this.elements.ollamaModel;
+        if (!ollamaSelect) return [];
+        
+        const models = [];
+        for (let i = 0; i < ollamaSelect.options.length; i++) {
+            const option = ollamaSelect.options[i];
+            if (option.value && option.value !== '') {
+                models.push(option.value);
+            }
+        }
+        return models;
+    }
+    
+    syncHeaderModelSelector() {
+        const headerSelect = this.elements.headerModelSelect;
+        if (!headerSelect) return;
+        
+        const currentProvider = this.settings.provider || 'ollama';
+        const currentModel = this.settings.model;
+        
+        if (currentModel) {
+            // Buscar la opción correspondiente
+            for (let i = 0; i < headerSelect.options.length; i++) {
+                const option = headerSelect.options[i];
+                const [model, provider] = this.parseHeaderModelValue(option.value);
+                
+                if (model === currentModel && provider === currentProvider) {
+                    headerSelect.value = option.value;
+                    break;
+                }
+            }
         }
     }
     
@@ -314,6 +458,9 @@ class AppManager {
         if (elements.maxTokens) {
             elements.maxTokens.value = this.settings.maxTokens || CONFIG.defaults.maxTokens;
         }
+        
+        // Sincronizar el selector del header
+        this.syncHeaderModelSelector();
     }
     
     collectSettingsFromUI() {

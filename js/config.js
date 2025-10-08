@@ -143,11 +143,75 @@ const Utils = {
     
     // Convertir markdown básico a HTML
     markdownToHtml(text) {
+        // Procesar bloques de código con sintaxis específica
+        text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, language, code) => {
+            const lang = language || 'text';
+            const trimmedCode = code.trim();
+            return `<div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">${lang}</span>
+                    <button class="copy-code-btn" onclick="copyCodeBlock(this)">
+                        <span class="material-icons">content_copy</span>
+                    </button>
+                </div>
+                <pre><code class="language-${lang}">${this.escapeHtml(trimmedCode)}</code></pre>
+            </div>`;
+        });
+        
+        // Procesar otros elementos markdown
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/`(.*?)`/g, '<code>$1</code>')
+            .replace(/`(.*?)`/g, '<code class="inline-code">$1</code>')
             .replace(/\n/g, '<br>');
+    }
+};
+
+// Función global para copiar bloques de código
+window.copyCodeBlock = async function(button) {
+    const codeBlock = button.closest('.code-block');
+    const codeElement = codeBlock.querySelector('code');
+    const codeText = codeElement.textContent;
+    
+    try {
+        await navigator.clipboard.writeText(codeText);
+        
+        // Feedback visual
+        const originalIcon = button.innerHTML;
+        button.innerHTML = '<span class="material-icons">check</span>';
+        button.classList.add('copied');
+        
+        setTimeout(() => {
+            button.innerHTML = originalIcon;
+            button.classList.remove('copied');
+        }, 2000);
+        
+        // Notificación
+        if (window.Swal) {
+            window.Swal.fire({
+                icon: 'success',
+                title: 'Código copiado',
+                text: 'El código se ha copiado al portapapeles',
+                toast: true,
+                position: 'bottom-end',
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+        }
+    } catch (error) {
+        console.error('Error al copiar código:', error);
+        if (window.Swal) {
+            window.Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo copiar el código',
+                toast: true,
+                position: 'bottom-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        }
     }
 };
 

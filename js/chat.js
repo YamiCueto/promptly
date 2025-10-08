@@ -164,6 +164,21 @@ class ChatManager {
         const processedContent = this.processMessageContent(messageData.content);
         contentElement.innerHTML = processedContent;
         
+        // Agregar botón de copiar para mensajes del asistente
+        if (messageData.role === 'assistant') {
+            const actionsElement = document.createElement('div');
+            actionsElement.className = 'message-actions';
+            
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-btn';
+            copyButton.innerHTML = '<span class="material-icons">content_copy</span>';
+            copyButton.title = 'Copiar respuesta';
+            copyButton.addEventListener('click', () => this.copyMessage(messageData.content));
+            
+            actionsElement.appendChild(copyButton);
+            contentElement.appendChild(actionsElement);
+        }
+        
         const metaElement = document.createElement('div');
         metaElement.className = 'message-meta';
         metaElement.textContent = this.formatMessageMeta(messageData);
@@ -299,6 +314,81 @@ class ChatManager {
         document.body.removeChild(a);
         
         URL.revokeObjectURL(url);
+    }
+    
+    async copyMessage(content) {
+        try {
+            // Limpiar el contenido HTML para obtener solo texto
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            const textContent = tempDiv.textContent || tempDiv.innerText || '';
+            
+            await navigator.clipboard.writeText(textContent);
+            
+            // Mostrar notificación usando SweetAlert2
+            if (window.Swal) {
+                window.Swal.fire({
+                    icon: 'success',
+                    title: 'Copiado',
+                    text: 'Respuesta copiada al portapapeles',
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+            }
+        } catch (error) {
+            console.error('Error al copiar:', error);
+            
+            // Fallback para navegadores que no soportan clipboard API
+            this.fallbackCopyMessage(content);
+        }
+    }
+    
+    fallbackCopyMessage(content) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+        
+        const textArea = document.createElement('textarea');
+        textArea.value = textContent;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            if (window.Swal) {
+                window.Swal.fire({
+                    icon: 'success',
+                    title: 'Copiado',
+                    text: 'Respuesta copiada al portapapeles',
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        } catch (error) {
+            console.error('Error en fallback copy:', error);
+            if (window.Swal) {
+                window.Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo copiar el texto',
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            }
+        } finally {
+            document.body.removeChild(textArea);
+        }
     }
 }
 

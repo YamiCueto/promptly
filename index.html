@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <meta name="description" content="Interfaz de chat AI que se conecta a Ollama local y APIs externas">
@@ -21,26 +24,39 @@
     <div class="app-container">
         <!-- Header -->
         <header class="header">
-            <div class="header-content">
-                <h1 class="logo">
-                    <span class="logo-icon">🤖</span>
-                    Promptly
-                </h1>
+                        <div class="header-content">
+                <div class="logo">
+                    <h1><span class="material-icons">auto_awesome</span> Promptly</h1>
+                    <span class="subtitle">Chat AI Assistant</span>
+                </div>
+                
+                <!-- Model Selector in Header -->
+                <div class="model-selector">
+                    <span class="material-icons model-icon">psychology</span>
+                    <label for="headerModelSelect" class="model-label">Modelo:</label>
+                    <select id="headerModelSelect" class="model-select">
+                        <option value="llama3.2">llama3.2 (Ollama)</option>
+                        <option value="llama3.1">llama3.1 (Ollama)</option>
+                        <option value="mistral">mistral (Ollama)</option>
+                        <option value="codellama">codellama (Ollama)</option>
+                        <option value="phi3">phi3 (Ollama)</option>
+                    </select>
+                </div>
+                
                 <div class="header-controls">
                     <button class="btn-secondary" id="settingsBtn">
-                        <span class="icon">⚙️</span>
+                        <span class="material-icons">settings</span>
                         Configuración
                     </button>
                     <button class="btn-secondary" id="clearChatBtn">
-                        <span class="icon">🗑️</span>
+                        <span class="material-icons">delete_outline</span>
                         Limpiar Chat
                     </button>
                     <button class="btn-secondary" id="exportChatBtn">
-                        <span class="icon">📤</span>
+                        <span class="material-icons">file_download</span>
                         Exportar
                     </button>
                 </div>
-            </div>
         </header>
 
         <!-- Main Content -->
@@ -72,7 +88,10 @@
                             <option value="codellama">codellama</option>
                             <option value="phi3">phi3</option>
                         </select>
-                        <button type="button" id="refreshModelsBtn" class="btn-secondary btn-sm">Actualizar Modelos</button>
+                        <button type="button" id="refreshModelsBtn" class="btn-secondary btn-sm">
+                            <span class="material-icons">refresh</span>
+                            Actualizar Modelos
+                        </button>
                     </div>
 
                     <div class="setting-group hidden" id="apiSettings">
@@ -141,7 +160,7 @@
                         rows="1"
                     ></textarea>
                     <button id="sendBtn" class="send-btn" disabled>
-                        <span class="send-icon">➤</span>
+                        <span class="material-icons">send</span>
                     </button>
                 </div>
                 <div class="input-info">
