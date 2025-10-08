@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptly - AI Chat Interface</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta name="description" content="Interfaz de chat AI que se conecta a Ollama local y APIs externas">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">
+                    <span class="logo-icon">🤖</span>
+                    Promptly
+                </h1>
+                <div class="header-controls">
+                    <button class="btn-secondary" id="settingsBtn">
+                        <span class="icon">⚙️</span>
+                        Configuración
+                    </button>
+                    <button class="btn-secondary" id="clearChatBtn">
+                        <span class="icon">🗑️</span>
+                        Limpiar Chat
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Settings Panel -->
+            <div class="settings-panel" id="settingsPanel">
+                <div class="settings-content">
+                    <h3>Configuración de AI</h3>
+                    
+                    <div class="setting-group">
+                        <label for="providerSelect">Proveedor:</label>
+                        <select id="providerSelect" class="form-select">
+                            <option value="ollama">Ollama (Local)</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="groq">Groq</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group" id="ollamaSettings">
+                        <label for="ollamaUrl">URL de Ollama:</label>
+                        <input type="text" id="ollamaUrl" class="form-input" value="http://localhost:11434" placeholder="http://localhost:11434">
+                        
+                        <label for="ollamaModel">Modelo:</label>
+                        <select id="ollamaModel" class="form-select">
+                            <option value="llama3.2">llama3.2</option>
+                            <option value="llama3.1">llama3.1</option>
+                            <option value="mistral">mistral</option>
+                            <option value="codellama">codellama</option>
+                            <option value="phi3">phi3</option>
+                        </select>
+                        <button type="button" id="refreshModelsBtn" class="btn-secondary btn-sm">Actualizar Modelos</button>
+                    </div>
+
+                    <div class="setting-group hidden" id="apiSettings">
+                        <label for="apiKey">API Key:</label>
+                        <input type="password" id="apiKey" class="form-input" placeholder="Ingresa tu API key">
+                        
+                        <label for="apiModel">Modelo:</label>
+                        <select id="apiModel" class="form-select">
+                            <!-- Se poblará dinámicamente según el proveedor -->
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="temperature">Temperatura:</label>
+                        <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7" class="form-range">
+                        <span id="temperatureValue">0.7</span>
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="maxTokens">Máx. Tokens:</label>
+                        <input type="number" id="maxTokens" class="form-input" value="2048" min="1" max="8192">
+                    </div>
+
+                    <div class="settings-actions">
+                        <button type="button" id="saveSettingsBtn" class="btn-primary">Guardar</button>
+                        <button type="button" id="closeSettingsBtn" class="btn-secondary">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <div class="welcome-content">
+                            <h2>¡Bienvenido a Promptly! 🚀</h2>
+                            <p>Tu interfaz de chat AI que se conecta tanto a Ollama local como a APIs externas.</p>
+                            <div class="features">
+                                <div class="feature">
+                                    <span class="feature-icon">🏠</span>
+                                    <span>Ollama Local</span>
+                                </div>
+                                <div class="feature">
+                                    <span class="feature-icon">☁️</span>
+                                    <span>APIs Externas</span>
+                                </div>
+                                <div class="feature">
+                                    <span class="feature-icon">🎨</span>
+                                    <span>Interfaz Moderna</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Area -->
+        <footer class="input-area">
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Escribe tu mensaje aquí..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendBtn" class="send-btn" disabled>
+                        <span class="send-icon">➤</span>
+                    </button>
+                </div>
+                <div class="input-info">
+                    <span class="connection-status" id="connectionStatus">
+                        <span class="status-dot"></span>
+                        Configurar conexión
+                    </span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Enviando mensaje...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/providers.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "name": "promptly",
+  "version": "1.0.0",
+  "description": "Una interfaz de chat moderna que se conecta a Ollama local y APIs externas de IA",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -c-1 -p 8000",
+    "dev": "npx http-server -c-1 -p 8000 --cors",
+    "build": "echo 'No build step required for vanilla JavaScript project'",
+    "test": "echo 'Tests not implemented yet'",
+    "lint": "echo 'Linting not configured'",
+    "deploy": "echo 'Deploy to GitHub Pages through repository settings'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YamiCueto/promptly.git"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "ollama",
+    "openai",
+    "anthropic",
+    "groq",
+    "claude",
+    "gpt",
+    "chatbot",
+    "ui",
+    "interface",
+    "local-ai",
+    "vanilla-js"
+  ],
+  "author": "YamiCueto",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/YamiCueto/promptly/issues"
+  },
+  "homepage": "https://yamicueto.github.io/promptly",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
