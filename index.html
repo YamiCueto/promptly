@@ -13,9 +13,6 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
-    <!-- Material Design Components -->
-    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <meta name="description" content="Interfaz de chat AI que se conecta a Ollama local y APIs externas">
@@ -36,45 +33,28 @@
                 <!-- Model Selector in Header -->
                 <div class="model-selector">
                     <span class="material-icons model-icon">psychology</span>
-                    <div class="mdc-select mdc-select--outlined model-select-wrapper">
-                        <div class="mdc-select__anchor">
-                            <span class="mdc-notched-outline">
-                                <span class="mdc-notched-outline__leading"></span>
-                                <span class="mdc-notched-outline__notch">
-                                    <span class="mdc-floating-label">Modelo</span>
-                                </span>
-                                <span class="mdc-notched-outline__trailing"></span>
-                            </span>
-                            <span class="mdc-select__selected-text-container">
-                                <span class="mdc-select__selected-text" id="headerModelSelect"></span>
-                            </span>
-                            <span class="mdc-select__dropdown-icon">
-                                <i class="material-icons">arrow_drop_down</i>
-                            </span>
-                        </div>
-                        <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
-                            <ul class="mdc-list" id="headerModelList">
-                                <!-- Options will be populated dynamically -->
-                            </ul>
-                        </div>
-                    </div>
+                    <label for="headerModelSelect" class="model-label">Modelo:</label>
+                    <select id="headerModelSelect" class="model-select">
+                        <option value="">Cargando modelos...</option>
+                    </select>
                 </div>
                 
                 <div class="header-controls">
-                    <button class="mdc-button mdc-button--outlined" id="settingsBtn">
-                        <span class="mdc-button__ripple"></span>
-                        <i class="material-icons mdc-button__icon" aria-hidden="true">settings</i>
-                        <span class="mdc-button__label">Configuración</span>
+                    <button class="btn-secondary" id="themeToggleBtn">
+                        <span class="material-icons">dark_mode</span>
+                        <span class="btn-text">Tema Oscuro</span>
                     </button>
-                    <button class="mdc-button mdc-button--outlined" id="clearChatBtn">
-                        <span class="mdc-button__ripple"></span>
-                        <i class="material-icons mdc-button__icon" aria-hidden="true">delete_outline</i>
-                        <span class="mdc-button__label">Limpiar Chat</span>
+                    <button class="btn-secondary" id="settingsBtn">
+                        <span class="material-icons">settings</span>
+                        <span class="btn-text">Configuración</span>
                     </button>
-                    <button class="mdc-button mdc-button--outlined" id="exportChatBtn">
-                        <span class="mdc-button__ripple"></span>
-                        <i class="material-icons mdc-button__icon" aria-hidden="true">file_download</i>
-                        <span class="mdc-button__label">Exportar</span>
+                    <button class="btn-secondary" id="clearChatBtn">
+                        <span class="material-icons">delete_outline</span>
+                        <span class="btn-text">Limpiar Chat</span>
+                    </button>
+                    <button class="btn-secondary" id="exportChatBtn">
+                        <span class="material-icons">file_download</span>
+                        <span class="btn-text">Exportar</span>
                     </button>
                 </div>
         </header>
@@ -173,21 +153,14 @@
         <footer class="input-area">
             <div class="input-container">
                 <div class="input-wrapper">
-                    <div class="mdc-text-field mdc-text-field--textarea mdc-text-field--outlined message-input-wrapper">
-                        <span class="mdc-notched-outline">
-                            <span class="mdc-notched-outline__leading"></span>
-                            <span class="mdc-notched-outline__notch">
-                                <span class="mdc-floating-label">Escribe tu mensaje aquí...</span>
-                            </span>
-                            <span class="mdc-notched-outline__trailing"></span>
-                        </span>
-                        <span class="mdc-text-field__resizer">
-                            <textarea id="messageInput" class="mdc-text-field__input" rows="1" aria-label="Mensaje"></textarea>
-                        </span>
-                    </div>
-                    <button id="sendBtn" class="mdc-fab mdc-fab--mini send-btn" disabled>
-                        <div class="mdc-fab__ripple"></div>
-                        <span class="material-icons mdc-fab__icon">send</span>
+                    <textarea 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Escribe tu mensaje aquí..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendBtn" class="send-btn" disabled>
+                        <span class="material-icons">send</span>
                     </button>
                 </div>
                 <div class="input-info">
@@ -207,9 +180,6 @@
     </div>
 
     <!-- Scripts -->
-    <!-- Material Design Components JS -->
-    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-    
     <script src="js/config.js"></script>
     <script src="js/providers.js"></script>
     <script src="js/chat.js"></script>

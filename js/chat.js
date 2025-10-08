@@ -3,6 +3,7 @@ class ChatManager {
     constructor() {
         this.messages = [];
         this.isTyping = false;
+        this.isStreaming = false;
         this.elements = {
             messagesContainer: null,
             messageInput: null,
@@ -140,7 +141,15 @@ class ChatManager {
         
         this.messages.push(messageData);
         this.renderMessage(messageData);
-        this.scrollToBottom();
+        
+        // Hacer scroll más agresivo para nuevos mensajes
+        const isAssistantMessage = role === 'assistant';
+        this.scrollToBottom(isAssistantMessage);
+        
+        // Auto-scroll continuo durante respuestas de IA
+        if (isAssistantMessage && !meta.isError) {
+            this.startContinuousScroll();
+        }
         
         // Limitar historial
         if (this.messages.length > CONFIG.ui.maxChatHistory) {
@@ -226,7 +235,16 @@ class ChatManager {
             if (messageElement) {
                 const processedContent = this.processMessageContent(detail.full);
                 messageElement.innerHTML = processedContent;
-                this.scrollToBottom();
+                
+                // Auto-scroll suave durante streaming
+                this.isStreaming = true;
+                this.scrollToBottom(true);
+                
+                // Debounce para marcar el final del streaming
+                clearTimeout(this.streamingTimeout);
+                this.streamingTimeout = setTimeout(() => {
+                    this.isStreaming = false;
+                }, 500);
             }
         }
     }
@@ -239,8 +257,14 @@ class ChatManager {
         if (loadingOverlay) {
             if (isTyping) {
                 loadingOverlay.classList.remove('hidden');
+                // Iniciar auto-scroll continuo durante typing
+                this.startContinuousScroll();
             } else {
                 loadingOverlay.classList.add('hidden');
+                // Detener auto-scroll cuando termine typing
+                this.stopContinuousScroll();
+                // Un último scroll al final
+                setTimeout(() => this.scrollToBottom(true), 100);
             }
         }
     }
@@ -267,15 +291,44 @@ class ChatManager {
         Utils.saveToStorage(CONFIG.storage.keys.chatHistory, []);
     }
     
-    scrollToBottom() {
+    scrollToBottom(smooth = false) {
         const container = this.elements.messagesContainer;
         if (container) {
-            const shouldScroll = container.scrollTop + container.clientHeight >= 
-                                container.scrollHeight - CONFIG.ui.autoScrollThreshold;
+            // Durante el typing o streaming, hacer scroll más agresivo
+            const isActiveResponse = this.isTyping || this.isStreaming;
+            const threshold = isActiveResponse ? 50 : CONFIG.ui.autoScrollThreshold;
             
-            if (shouldScroll) {
-                container.scrollTop = container.scrollHeight;
+            const shouldScroll = container.scrollTop + container.clientHeight >= 
+                                container.scrollHeight - threshold;
+            
+            if (shouldScroll || isActiveResponse) {
+                if (smooth) {
+                    container.scrollTo({
+                        top: container.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    container.scrollTop = container.scrollHeight;
+                }
             }
+        }
+    }
+    
+    startContinuousScroll() {
+        // Scroll continuo durante respuestas para asegurar visibilidad
+        this.continuousScrollInterval = setInterval(() => {
+            if (this.isTyping || this.isStreaming) {
+                this.scrollToBottom(true);
+            } else {
+                this.stopContinuousScroll();
+            }
+        }, CONFIG.ui.scrollInterval); // Usar configuración del archivo config
+    }
+    
+    stopContinuousScroll() {
+        if (this.continuousScrollInterval) {
+            clearInterval(this.continuousScrollInterval);
+            this.continuousScrollInterval = null;
         }
     }
     

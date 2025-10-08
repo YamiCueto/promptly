@@ -15,6 +15,9 @@ class AppManager {
         // Configurar event listeners
         this.setupEventListeners();
         
+        // Inicializar tema
+        this.initializeTheme();
+        
         // Cargar configuración guardada
         this.loadSettings();
         
@@ -28,6 +31,7 @@ class AppManager {
     getElements() {
         this.elements = {
             // Header
+            themeToggleBtn: document.getElementById('themeToggleBtn'),
             settingsBtn: document.getElementById('settingsBtn'),
             clearChatBtn: document.getElementById('clearChatBtn'),
             exportChatBtn: document.getElementById('exportChatBtn'),
@@ -58,6 +62,7 @@ class AppManager {
     
     setupEventListeners() {
         // Botones del header
+        this.elements.themeToggleBtn?.addEventListener('click', () => this.toggleTheme());
         this.elements.settingsBtn?.addEventListener('click', () => this.toggleSettings());
         this.elements.clearChatBtn?.addEventListener('click', () => this.clearChat());
         this.elements.exportChatBtn?.addEventListener('click', () => this.exportChat());
@@ -132,12 +137,17 @@ class AppManager {
         });
     }
     
-    initializeUI() {
+    async initializeUI() {
         // Configurar provider inicial
         this.handleProviderChange(this.settings.provider || CONFIG.defaults.provider);
         
         // Actualizar valores en la UI
         this.updateUIFromSettings();
+        
+        // Auto-refresh modelos de Ollama si es el proveedor por defecto
+        if ((this.settings.provider || CONFIG.defaults.provider) === 'ollama') {
+            await this.refreshOllamaModels();
+        }
         
         // Inicializar selector del header
         this.updateHeaderModelSelector();
@@ -276,6 +286,10 @@ class AppManager {
                     // Restaurar selección anterior si existe
                     if (currentValue && models.find(m => m.name === currentValue)) {
                         modelSelect.value = currentValue;
+                    } else if (models.length > 0 && !this.settings.model) {
+                        // Si no hay modelo seleccionado, usar el primero disponible
+                        modelSelect.value = models[0].name;
+                        this.settings.model = models[0].name;
                     }
                 } else {
                     const option = document.createElement('option');
@@ -287,45 +301,59 @@ class AppManager {
             
             this.updateConnectionStatus();
             
-            // Actualizar el selector del header
+            // Actualizar el selector del header después de cargar los modelos
             this.updateHeaderModelSelector();
+            
+            // Notificación de éxito si se encontraron modelos
+            if (models && models.length > 0) {
+                console.log(`✅ ${models.length} modelos de Ollama encontrados:`, models.map(m => m.name));
+                
+                // Solo mostrar notificación si se ejecuta manualmente (no en inicialización)
+                if (refreshBtn && refreshBtn.textContent === 'Actualizando...') {
+                    this.showNotification(`${models.length} modelos encontrados`, 'success', 2000);
+                }
+            }
+            
+            return models;
+            
         } catch (error) {
             console.error('Error actualizando modelos:', error);
-            this.showNotification('Error al actualizar modelos de Ollama', 'error');
-        }
-        
-        if (refreshBtn) {
-            refreshBtn.disabled = false;
-            refreshBtn.textContent = 'Actualizar Modelos';
-        }
-        
-        // Notificación de éxito si se encontraron modelos
-        if (models && models.length > 0) {
-            this.showNotification(`${models.length} modelos encontrados`, 'success', 2000);
+            
+            // Solo mostrar notificación de error si se ejecuta manualmente
+            if (refreshBtn && refreshBtn.textContent === 'Actualizando...') {
+                this.showNotification('Error al actualizar modelos de Ollama', 'error');
+            }
+            return [];
+        } finally {
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = 'Actualizar Modelos';
+            }
         }
     }
     
     updateHeaderModelSelector() {
-        const headerList = document.getElementById('headerModelList');
-        const headerSelect = document.getElementById('headerModelSelect');
-        if (!headerList || !headerSelect) return;
+        const headerSelect = this.elements.headerModelSelect;
+        if (!headerSelect) return;
         
-        // Limpiar lista existente
-        headerList.innerHTML = '';
+        const currentValue = headerSelect.value;
+        headerSelect.innerHTML = '';
         
         // Agregar modelos de Ollama
         const ollamaModels = this.getAvailableOllamaModels();
         if (ollamaModels.length > 0) {
             ollamaModels.forEach(model => {
-                const listItem = document.createElement('li');
-                listItem.className = 'mdc-list-item';
-                listItem.setAttribute('data-value', model);
-                listItem.innerHTML = `
-                    <span class="mdc-list-item__ripple"></span>
-                    <span class="mdc-list-item__text">${model} (Ollama)</span>
-                `;
-                headerList.appendChild(listItem);
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = `${model} (Ollama)`;
+                headerSelect.appendChild(option);
             });
+        } else if (this.settings.provider === 'ollama') {
+            // Si no hay modelos de Ollama pero es el proveedor seleccionado
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'No hay modelos de Ollama disponibles';
+            headerSelect.appendChild(option);
         }
         
         // Agregar modelos de APIs externas
@@ -333,16 +361,20 @@ class AppManager {
         providers.forEach(provider => {
             const models = aiProviders.getModelsForProvider(provider);
             models.forEach(model => {
-                const listItem = document.createElement('li');
-                listItem.className = 'mdc-list-item';
-                listItem.setAttribute('data-value', `${model} (${provider})`);
-                listItem.innerHTML = `
-                    <span class="mdc-list-item__ripple"></span>
-                    <span class="mdc-list-item__text">${model} (${provider.charAt(0).toUpperCase() + provider.slice(1)})</span>
-                `;
-                headerList.appendChild(listItem);
+                const option = document.createElement('option');
+                option.value = `${model} (${provider})`;
+                option.textContent = `${model} (${provider.charAt(0).toUpperCase() + provider.slice(1)})`;
+                headerSelect.appendChild(option);
             });
         });
+        
+        // Si no hay opciones disponibles
+        if (headerSelect.options.length === 0) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'No hay modelos disponibles';
+            headerSelect.appendChild(option);
+        }
         
         // Restaurar selección si es posible
         this.syncHeaderModelSelector();
@@ -363,27 +395,20 @@ class AppManager {
     }
     
     syncHeaderModelSelector() {
-        const headerSelect = document.getElementById('headerModelSelect');
-        const headerList = document.getElementById('headerModelList');
-        if (!headerSelect || !headerList) return;
+        const headerSelect = this.elements.headerModelSelect;
+        if (!headerSelect) return;
         
         const currentProvider = this.settings.provider || 'ollama';
         const currentModel = this.settings.model;
         
         if (currentModel) {
-            // Buscar el item correspondiente en la lista
-            const listItems = headerList.querySelectorAll('.mdc-list-item');
-            for (let item of listItems) {
-                const value = item.getAttribute('data-value');
-                const [model, provider] = this.parseHeaderModelValue(value);
+            // Buscar la opción correspondiente
+            for (let i = 0; i < headerSelect.options.length; i++) {
+                const option = headerSelect.options[i];
+                const [model, provider] = this.parseHeaderModelValue(option.value);
                 
                 if (model === currentModel && provider === currentProvider) {
-                    // Actualizar el texto seleccionado
-                    headerSelect.textContent = item.querySelector('.mdc-list-item__text').textContent;
-                    
-                    // Marcar como seleccionado
-                    listItems.forEach(li => li.classList.remove('mdc-list-item--selected'));
-                    item.classList.add('mdc-list-item--selected');
+                    headerSelect.value = option.value;
                     break;
                 }
             }
@@ -647,6 +672,63 @@ class AppManager {
         this.showNotification('Chat exportado como Markdown', 'success');
     }
     
+    // Funciones de tema
+    toggleTheme() {
+        const currentTheme = this.getCurrentTheme();
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+    }
+    
+    getCurrentTheme() {
+        return document.documentElement.getAttribute('data-theme') || 'light';
+    }
+    
+    setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        this.updateThemeButton();
+        
+        // Notificar el cambio
+        const themeName = theme === 'dark' ? 'Tema Oscuro' : 'Tema Claro';
+        this.showNotification(`Cambiado a ${themeName}`, 'success', 2000);
+    }
+    
+    updateThemeButton() {
+        const themeBtn = this.elements.themeToggleBtn;
+        if (!themeBtn) return;
+        
+        const currentTheme = this.getCurrentTheme();
+        const icon = themeBtn.querySelector('.material-icons');
+        const label = themeBtn.querySelector('.btn-text');
+        
+        if (currentTheme === 'dark') {
+            icon.textContent = 'light_mode';
+            label.textContent = 'Tema Claro';
+            themeBtn.classList.add('theme-active');
+        } else {
+            icon.textContent = 'dark_mode';
+            label.textContent = 'Tema Oscuro';
+            themeBtn.classList.remove('theme-active');
+        }
+    }
+    
+    initializeTheme() {
+        // Cargar tema guardado o usar tema claro como default
+        const savedTheme = localStorage.getItem('theme');
+        
+        // Por defecto usar tema claro, solo usar oscuro si está guardado o si el usuario lo prefiere explícitamente
+        const theme = savedTheme || 'light';
+        this.setTheme(theme);
+        
+        // Escuchar cambios en la preferencia del sistema solo si no hay tema guardado
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                // Mantener tema claro como default incluso si el sistema prefiere oscuro
+                // Solo cambiar si el usuario ha interactuado explícitamente
+            }
+        });
+    }
+    
     downloadFile(content, filename, mimeType) {
         const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
@@ -714,44 +796,6 @@ class AppManager {
 
 // Inicializar aplicación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar Material Design Components
-    if (window.mdc) {
-        // Initialize all MDC buttons
-        const buttons = document.querySelectorAll('.mdc-button');
-        buttons.forEach(button => {
-            new mdc.ripple.MDCRipple(button);
-        });
-        
-        // Initialize FAB
-        const fab = document.querySelector('.mdc-fab');
-        if (fab) {
-            new mdc.ripple.MDCRipple(fab);
-        }
-        
-        // Initialize Select components
-        const selects = document.querySelectorAll('.mdc-select');
-        selects.forEach(selectElement => {
-            const select = new mdc.select.MDCSelect(selectElement);
-            
-            // Add event listener for model selector
-            if (selectElement.querySelector('#headerModelSelect')) {
-                select.listen('MDCSelect:change', () => {
-                    const selectedItem = selectElement.querySelector('.mdc-list-item--selected');
-                    if (selectedItem && window.appManager) {
-                        const value = selectedItem.getAttribute('data-value');
-                        window.appManager.handleHeaderModelChange(value);
-                    }
-                });
-            }
-        });
-        
-        // Initialize Text Fields
-        const textFields = document.querySelectorAll('.mdc-text-field');
-        textFields.forEach(textField => {
-            new mdc.textField.MDCTextField(textField);
-        });
-    }
-    
     window.appManager = new AppManager();
 });
 

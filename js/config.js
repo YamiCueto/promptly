@@ -65,7 +65,9 @@ const CONFIG = {
     ui: {
         maxChatHistory: 100,
         typingAnimationDelay: 20,
-        autoScrollThreshold: 100
+        autoScrollThreshold: 50, // Más sensible para mejor auto-scroll
+        scrollInterval: 100, // Intervalo para scroll continuo en ms
+        smoothScrollDuration: 300 // Duración de scroll suave
     }
 };
 
