@@ -17,6 +17,8 @@ Una interfaz de chat moderna y elegante que se conecta tanto a **Ollama local** 
 - ⚡ **Vanilla JavaScript** - Sin frameworks pesados, carga rápida
 - 💾 **Historial Local** - Guarda tus conversaciones en el navegador
 - 🌙 **Tema Oscuro** - Interfaz cómoda para los ojos
+- 🎊 **Notificaciones Elegantes** - SweetAlert2 para mejor UX
+- 📤 **Exportar Conversaciones** - Descarga en formato texto o Markdown
 
 ## 🚀 Demo en Vivo
 

@@ -84,6 +84,22 @@ body {
 .header-controls {
     display: flex;
     gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .header-controls {
+        gap: 0.5rem;
+    }
+    
+    .header-controls .btn-secondary {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .header-controls .btn-secondary .icon {
+        font-size: 0.9rem;
+    }
 }
 
 /* Botones */
@@ -534,4 +550,35 @@ body {
         flex-direction: column;
         align-items: center;
     }
+}
+
+/* SweetAlert2 Tema Oscuro */
+.swal-dark-theme {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.swal2-popup.swal-dark-theme {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+}
+
+.swal2-title {
+    color: var(--text-primary) !important;
+}
+
+.swal2-html-container {
+    color: var(--text-secondary) !important;
+}
+
+.swal2-progress-steps .swal2-progress-step {
+    background: var(--primary-color) !important;
+}
+
+.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step {
+    background: var(--primary-dark) !important;
+}
+
+.swal2-timer-progress-bar {
+    background: var(--primary-color) !important;
 }

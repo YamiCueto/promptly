@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <meta name="description" content="Interfaz de chat AI que se conecta a Ollama local y APIs externas">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="app-container">
@@ -25,6 +28,10 @@
                     <button class="btn-secondary" id="clearChatBtn">
                         <span class="icon">🗑️</span>
                         Limpiar Chat
+                    </button>
+                    <button class="btn-secondary" id="exportChatBtn">
+                        <span class="icon">📤</span>
+                        Exportar
                     </button>
                 </div>
             </div>

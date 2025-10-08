@@ -106,12 +106,20 @@ class ChatManager {
                 this.addMessage('assistant', `Error: ${response.error}`, {
                     isError: true
                 });
+                // Mostrar notificación de error con SweetAlert2
+                if (window.appManager) {
+                    window.appManager.showNotification(`Error de conexión: ${response.error}`, 'error');
+                }
             }
         } catch (error) {
             console.error('Error enviando mensaje:', error);
             this.addMessage('assistant', `Error inesperado: ${error.message}`, {
                 isError: true
             });
+            // Mostrar notificación de error inesperado
+            if (window.appManager) {
+                window.appManager.showNotification('Error inesperado al enviar mensaje', 'error');
+            }
         }
         
         this.setTyping(false);

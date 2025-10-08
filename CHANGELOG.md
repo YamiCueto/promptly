@@ -1,5 +1,88 @@
 # Promptly - Changelog
 
+## [1.1.0] - 2024-10-08
+
+### 🎊 Nuevas Características
+
+#### Notificaciones Elegantes
+- ✨ **SweetAlert2 Integration** - Reemplazadas notificaciones básicas con SweetAlert2
+- 🎨 **Tema Oscuro Personalizado** - Notificaciones que se integran perfectamente con el diseño
+- 🔔 **Notificaciones Contextuales** - Success, error, warning e info con iconos apropiados
+- ⏱️ **Auto-dismiss con Pausa** - Se pausan al hacer hover, se reanudan al salir
+
+#### Exportación de Conversaciones
+- 📤 **Botón de Exportar** - Nuevo botón en el header para exportar conversaciones
+- 📄 **Formato Texto** - Exportación en formato .txt con timestamps
+- 📋 **Formato Markdown** - Exportación en .md con formato estructurado
+- 🎯 **Diálogo de Selección** - SweetAlert2 para elegir formato de exportación
+
+#### Mejoras de UX
+- ❓ **Confirmación Elegante** - SweetAlert2 para confirmación de limpiar chat
+- ⚠️ **Validaciones Mejoradas** - Notificaciones claras para errores de configuración
+- 🔄 **Feedback de Conexión** - Notificaciones para actualizaciones de modelos Ollama
+- 📱 **Responsive Design** - Botones del header optimizados para móviles
+
+### 🛠️ Mejoras Técnicas
+
+#### GitHub Actions
+- 🔧 **Workflows Corregidos** - Arreglados errores de npm ci y sintaxis YAML
+- 📦 **package-lock.json** - Agregado para caching correcto de dependencias
+- ✅ **CI Simplificado** - Tests más robustos y compatibles con CI/CD
+- 🚀 **Deploy Estable** - Proceso de despliegue más confiable
+
+#### Código y Estructura
+- 🧹 **Código Limpio** - Funciones de notificación centralizadas
+- 📝 **Documentación Actualizada** - INSTRUCTIONS.md con troubleshooting mejorado
+- 🎨 **CSS Organizado** - Estilos de SweetAlert2 integrados con variables CSS
+- 🔗 **CDN Integration** - SweetAlert2 cargado desde jsdelivr CDN
+
+### 🔧 Dependencias
+
+#### Nuevas Dependencias CDN
+- **SweetAlert2** `v11` - Para notificaciones elegantes
+- **jsdelivr CDN** - Para carga rápida y confiable
+
+### 📋 Detalles de Implementación
+
+#### SweetAlert2 Features
+- 🎨 **Tema Oscuro Personalizado** - Colores integrados con variables CSS del proyecto
+- 🔄 **Toast Notifications** - Posicionadas en top-end con auto-dismiss
+- ❓ **Modales de Confirmación** - Para acciones destructivas como limpiar chat
+- 📤 **Modales de Selección** - Para elegir formato de exportación
+
+#### Export Features
+- 📄 **Texto Plano**: Formato simple con timestamps en español
+- 📋 **Markdown**: Formato estructurado con headers, timestamps y emojis
+- 💾 **Download Automático**: Usando Blob API para descarga directa
+- 🏷️ **Nombres Únicos**: Archivos con timestamp para evitar conflictos
+
+### 🚨 Breaking Changes
+- ❌ **Función `alert()` Removida** - Reemplazada por SweetAlert2
+- ❌ **Función `confirm()` Removida** - Reemplazada por SweetAlert2
+- ✅ **API Backward Compatible** - Métodos públicos mantienen compatibilidad
+
+### 🔄 Migration Guide
+
+Para proyectos que extienden Promptly:
+```javascript
+// Antes
+alert('Mensaje');
+confirm('¿Continuar?');
+
+// Ahora
+window.appManager.showNotification('Mensaje', 'info');
+Swal.fire({
+    title: '¿Continuar?',
+    showCancelButton: true
+}).then((result) => {
+    if (result.isConfirmed) {
+        // Acción confirmada
+    }
+});
+```
+
+---
+
 ## [1.0.0] - 2024-10-08
 
 ### ✨ Características Iniciales

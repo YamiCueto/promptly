@@ -1,7 +1,7 @@
 {
   "name": "promptly",
   "version": "1.0.0",
-  "description": "Una interfaz de chat moderna que se conecta a Ollama local y APIs externas de IA",
+  "description": "Una interfaz de chat moderna que se conecta a Ollama local y APIs externas de IA con notificaciones elegantes usando SweetAlert2",
   "main": "index.html",
   "scripts": {
     "start": "npx http-server -c-1 -p 8000 --silent",

@@ -30,6 +30,7 @@ class AppManager {
             // Header
             settingsBtn: document.getElementById('settingsBtn'),
             clearChatBtn: document.getElementById('clearChatBtn'),
+            exportChatBtn: document.getElementById('exportChatBtn'),
             
             // Settings Panel
             settingsPanel: document.getElementById('settingsPanel'),
@@ -58,6 +59,7 @@ class AppManager {
         // Botones del header
         this.elements.settingsBtn?.addEventListener('click', () => this.toggleSettings());
         this.elements.clearChatBtn?.addEventListener('click', () => this.clearChat());
+        this.elements.exportChatBtn?.addEventListener('click', () => this.exportChat());
         
         // Settings panel
         this.elements.closeSettingsBtn?.addEventListener('click', () => this.closeSettings());
@@ -214,11 +216,17 @@ class AppManager {
             this.updateConnectionStatus();
         } catch (error) {
             console.error('Error actualizando modelos:', error);
+            this.showNotification('Error al actualizar modelos de Ollama', 'error');
         }
         
         if (refreshBtn) {
             refreshBtn.disabled = false;
             refreshBtn.textContent = 'Actualizar Modelos';
+        }
+        
+        // Notificación de éxito si se encontraron modelos
+        if (models && models.length > 0) {
+            this.showNotification(`${models.length} modelos encontrados`, 'success', 2000);
         }
     }
     
@@ -333,12 +341,12 @@ class AppManager {
         
         // Validar configuración
         if (newSettings.provider !== 'ollama' && !newSettings.apiKey) {
-            alert('API Key es requerida para este proveedor');
+            this.showNotification('API Key es requerida para este proveedor', 'error');
             return;
         }
         
         if (!newSettings.model) {
-            alert('Debe seleccionar un modelo');
+            this.showNotification('Debe seleccionar un modelo', 'warning');
             return;
         }
         
@@ -390,51 +398,138 @@ class AppManager {
     }
     
     clearChat() {
-        if (confirm('¿Estás seguro de que quieres limpiar todo el chat?')) {
-            chatManager.clearChat();
-            this.showNotification('Chat limpiado');
-        }
+        Swal.fire({
+            title: '¿Limpiar chat?',
+            text: '¿Estás seguro de que quieres eliminar toda la conversación?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, limpiar',
+            cancelButtonText: 'Cancelar',
+            background: 'var(--surface)',
+            color: 'var(--text-primary)',
+            confirmButtonColor: 'var(--primary-color)',
+            cancelButtonColor: 'var(--border)',
+            customClass: {
+                popup: 'swal-dark-theme'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                chatManager.clearChat();
+                this.showNotification('Chat limpiado exitosamente');
+            }
+        });
     }
     
-    showNotification(message, type = 'success') {
-        // Crear elemento de notificación
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        
-        // Estilos
-        Object.assign(notification.style, {
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            padding: '12px 20px',
-            borderRadius: '8px',
-            background: type === 'success' ? '#10b981' : '#ef4444',
-            color: 'white',
-            fontSize: '14px',
-            fontWeight: '500',
-            zIndex: '1001',
-            opacity: '0',
-            transform: 'translateX(100%)',
-            transition: 'all 0.3s ease'
+    exportChat() {
+        if (!chatManager.messages || chatManager.messages.length === 0) {
+            this.showNotification('No hay mensajes para exportar', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Exportar Chat',
+            text: 'Selecciona el formato de exportación:',
+            icon: 'question',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: '📄 Texto (.txt)',
+            denyButtonText: '📋 Markdown (.md)',
+            cancelButtonText: 'Cancelar',
+            background: 'var(--surface)',
+            color: 'var(--text-primary)',
+            confirmButtonColor: 'var(--primary-color)',
+            denyButtonColor: 'var(--secondary-color)',
+            cancelButtonColor: 'var(--border)',
+            customClass: {
+                popup: 'swal-dark-theme'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Exportar como texto
+                this.exportChatAsText();
+            } else if (result.isDenied) {
+                // Exportar como markdown
+                this.exportChatAsMarkdown();
+            }
         });
+    }
+    
+    exportChatAsText() {
+        const chatText = chatManager.messages.map(msg => {
+            const role = msg.role === 'user' ? 'Usuario' : 'Asistente';
+            const time = new Date(msg.timestamp).toLocaleString('es-ES');
+            return `[${time}] ${role}: ${msg.content}`;
+        }).join('\n\n');
         
-        document.body.appendChild(notification);
+        this.downloadFile(chatText, `promptly-chat-${Date.now()}.txt`, 'text/plain');
+        this.showNotification('Chat exportado como texto', 'success');
+    }
+    
+    exportChatAsMarkdown() {
+        const chatMarkdown = [
+            '# Chat Export - Promptly',
+            `**Fecha**: ${new Date().toLocaleString('es-ES')}`,
+            `**Mensajes**: ${chatManager.messages.length}`,
+            '',
+            '---',
+            '',
+            ...chatManager.messages.map(msg => {
+                const role = msg.role === 'user' ? '🧑‍💻 **Usuario**' : '🤖 **Asistente**';
+                const time = new Date(msg.timestamp).toLocaleString('es-ES');
+                return `## ${role}\n*${time}*\n\n${msg.content}\n`;
+            })
+        ].join('\n');
         
-        // Animar entrada
-        setTimeout(() => {
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateX(0)';
-        }, 10);
+        this.downloadFile(chatMarkdown, `promptly-chat-${Date.now()}.md`, 'text/markdown');
+        this.showNotification('Chat exportado como Markdown', 'success');
+    }
+    
+    downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
         
-        // Remover después de 3 segundos
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        URL.revokeObjectURL(url);
+    }
+    
+    showNotification(message, type = 'success', duration = 3000) {
+        // Configuración de iconos y colores para SweetAlert2
+        const config = {
+            title: type === 'success' ? '¡Éxito!' : type === 'error' ? 'Error' : 'Información',
+            text: message,
+            icon: type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'success',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: duration,
+            timerProgressBar: true,
+            background: 'var(--surface)',
+            color: 'var(--text-primary)',
+            customClass: {
+                popup: 'swal-dark-theme'
+            },
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        };
+
+        // Configuraciones específicas por tipo
+        if (type === 'success') {
+            config.iconColor = '#10b981';
+        } else if (type === 'error') {
+            config.iconColor = '#ef4444';
+        } else if (type === 'warning') {
+            config.iconColor = '#f59e0b';
+        }
+
+        Swal.fire(config);
     }
     
     getCurrentSettings() {
