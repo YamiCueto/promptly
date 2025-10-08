@@ -22,7 +22,9 @@ Una interfaz de chat moderna y elegante que se conecta tanto a **Ollama local** 
 
 Visita: [https://yamicueto.github.io/promptly](https://yamicueto.github.io/promptly)
 
-## 🛠️ Instalación y Uso
+> **📋 IMPORTANTE**: Para configuración completa, troubleshooting y convenciones de desarrollo, consulta [INSTRUCTIONS.md](INSTRUCTIONS.md)
+
+## 🛠️ Instalación Rápida
 
 ### Opción 1: Uso Directo (Recomendado)
 
