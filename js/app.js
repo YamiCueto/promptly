@@ -306,20 +306,25 @@ class AppManager {
     }
     
     updateHeaderModelSelector() {
-        const headerSelect = this.elements.headerModelSelect;
-        if (!headerSelect) return;
+        const headerList = document.getElementById('headerModelList');
+        const headerSelect = document.getElementById('headerModelSelect');
+        if (!headerList || !headerSelect) return;
         
-        const currentValue = headerSelect.value;
-        headerSelect.innerHTML = '';
+        // Limpiar lista existente
+        headerList.innerHTML = '';
         
         // Agregar modelos de Ollama
         const ollamaModels = this.getAvailableOllamaModels();
         if (ollamaModels.length > 0) {
             ollamaModels.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model;
-                option.textContent = `${model} (Ollama)`;
-                headerSelect.appendChild(option);
+                const listItem = document.createElement('li');
+                listItem.className = 'mdc-list-item';
+                listItem.setAttribute('data-value', model);
+                listItem.innerHTML = `
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">${model} (Ollama)</span>
+                `;
+                headerList.appendChild(listItem);
             });
         }
         
@@ -328,10 +333,14 @@ class AppManager {
         providers.forEach(provider => {
             const models = aiProviders.getModelsForProvider(provider);
             models.forEach(model => {
-                const option = document.createElement('option');
-                option.value = `${model} (${provider})`;
-                option.textContent = `${model} (${provider.charAt(0).toUpperCase() + provider.slice(1)})`;
-                headerSelect.appendChild(option);
+                const listItem = document.createElement('li');
+                listItem.className = 'mdc-list-item';
+                listItem.setAttribute('data-value', `${model} (${provider})`);
+                listItem.innerHTML = `
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">${model} (${provider.charAt(0).toUpperCase() + provider.slice(1)})</span>
+                `;
+                headerList.appendChild(listItem);
             });
         });
         
@@ -354,20 +363,27 @@ class AppManager {
     }
     
     syncHeaderModelSelector() {
-        const headerSelect = this.elements.headerModelSelect;
-        if (!headerSelect) return;
+        const headerSelect = document.getElementById('headerModelSelect');
+        const headerList = document.getElementById('headerModelList');
+        if (!headerSelect || !headerList) return;
         
         const currentProvider = this.settings.provider || 'ollama';
         const currentModel = this.settings.model;
         
         if (currentModel) {
-            // Buscar la opción correspondiente
-            for (let i = 0; i < headerSelect.options.length; i++) {
-                const option = headerSelect.options[i];
-                const [model, provider] = this.parseHeaderModelValue(option.value);
+            // Buscar el item correspondiente en la lista
+            const listItems = headerList.querySelectorAll('.mdc-list-item');
+            for (let item of listItems) {
+                const value = item.getAttribute('data-value');
+                const [model, provider] = this.parseHeaderModelValue(value);
                 
                 if (model === currentModel && provider === currentProvider) {
-                    headerSelect.value = option.value;
+                    // Actualizar el texto seleccionado
+                    headerSelect.textContent = item.querySelector('.mdc-list-item__text').textContent;
+                    
+                    // Marcar como seleccionado
+                    listItems.forEach(li => li.classList.remove('mdc-list-item--selected'));
+                    item.classList.add('mdc-list-item--selected');
                     break;
                 }
             }
@@ -698,6 +714,44 @@ class AppManager {
 
 // Inicializar aplicación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar Material Design Components
+    if (window.mdc) {
+        // Initialize all MDC buttons
+        const buttons = document.querySelectorAll('.mdc-button');
+        buttons.forEach(button => {
+            new mdc.ripple.MDCRipple(button);
+        });
+        
+        // Initialize FAB
+        const fab = document.querySelector('.mdc-fab');
+        if (fab) {
+            new mdc.ripple.MDCRipple(fab);
+        }
+        
+        // Initialize Select components
+        const selects = document.querySelectorAll('.mdc-select');
+        selects.forEach(selectElement => {
+            const select = new mdc.select.MDCSelect(selectElement);
+            
+            // Add event listener for model selector
+            if (selectElement.querySelector('#headerModelSelect')) {
+                select.listen('MDCSelect:change', () => {
+                    const selectedItem = selectElement.querySelector('.mdc-list-item--selected');
+                    if (selectedItem && window.appManager) {
+                        const value = selectedItem.getAttribute('data-value');
+                        window.appManager.handleHeaderModelChange(value);
+                    }
+                });
+            }
+        });
+        
+        // Initialize Text Fields
+        const textFields = document.querySelectorAll('.mdc-text-field');
+        textFields.forEach(textField => {
+            new mdc.textField.MDCTextField(textField);
+        });
+    }
+    
     window.appManager = new AppManager();
 });
 

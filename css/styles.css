@@ -1,5 +1,17 @@
 /* Variables CSS */
 :root {
+    /* Material Design Colors for Dark Theme */
+    --mdc-theme-primary: #667eea;
+    --mdc-theme-primary-variant: #5a6fd8;
+    --mdc-theme-secondary: #f093fb;
+    --mdc-theme-surface: #1a1a2e;
+    --mdc-theme-background: #0f0f23;
+    --mdc-theme-on-primary: #ffffff;
+    --mdc-theme-on-secondary: #000000;
+    --mdc-theme-on-surface: #ffffff;
+    --mdc-theme-on-background: #ffffff;
+    
+    /* Original Variables */
     --primary-color: #667eea;
     --primary-dark: #5a6fd8;
     --secondary-color: #f093fb;
@@ -925,4 +937,184 @@ pre code {
 
 .swal2-timer-progress-bar {
     background: var(--primary-color) !important;
+}
+
+/* ============================================
+   MATERIAL DESIGN CUSTOM STYLES
+   ============================================ */
+
+/* Material Design Button Overrides */
+.mdc-button {
+    --mdc-theme-primary: var(--primary-color);
+    --mdc-theme-on-surface: var(--text-primary);
+    border-radius: var(--border-radius) !important;
+    text-transform: none !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+}
+
+.mdc-button--outlined {
+    --mdc-outlined-button-outline-color: var(--border);
+    border-color: var(--border) !important;
+    background-color: var(--surface) !important;
+}
+
+.mdc-button--outlined:hover {
+    background-color: var(--surface-light) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.mdc-button__icon {
+    color: var(--text-secondary) !important;
+    margin-right: 0.5rem !important;
+}
+
+.mdc-button__label {
+    color: var(--text-primary) !important;
+}
+
+/* Material Design FAB Overrides */
+.mdc-fab {
+    --mdc-theme-secondary: var(--primary-color);
+    background-color: var(--primary-color) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+.mdc-fab:disabled {
+    background-color: var(--border) !important;
+    color: var(--text-muted) !important;
+}
+
+.mdc-fab__icon {
+    color: white !important;
+}
+
+/* Material Design Select Overrides */
+.mdc-select {
+    --mdc-theme-primary: var(--primary-color);
+    width: 100%;
+}
+
+.mdc-select--outlined .mdc-notched-outline__leading,
+.mdc-select--outlined .mdc-notched-outline__notch,
+.mdc-select--outlined .mdc-notched-outline__trailing {
+    border-color: var(--border) !important;
+}
+
+.mdc-select--outlined:hover .mdc-notched-outline__leading,
+.mdc-select--outlined:hover .mdc-notched-outline__notch,
+.mdc-select--outlined:hover .mdc-notched-outline__trailing {
+    border-color: var(--primary-color) !important;
+}
+
+.mdc-select__anchor {
+    background-color: var(--surface) !important;
+    border-radius: var(--border-radius) !important;
+}
+
+.mdc-select__selected-text {
+    color: var(--text-primary) !important;
+}
+
+.mdc-floating-label {
+    color: var(--text-secondary) !important;
+}
+
+.mdc-floating-label--float-above {
+    color: var(--primary-color) !important;
+}
+
+.mdc-select__dropdown-icon {
+    color: var(--text-secondary) !important;
+}
+
+.mdc-menu-surface {
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--border-radius) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.mdc-list-item {
+    color: var(--text-primary) !important;
+    padding: 0.75rem 1rem !important;
+}
+
+.mdc-list-item:hover {
+    background-color: var(--surface-light) !important;
+}
+
+.mdc-list-item--selected {
+    background-color: rgba(102, 126, 234, 0.1) !important;
+    color: var(--primary-color) !important;
+}
+
+/* Material Design Text Field Overrides */
+.mdc-text-field {
+    --mdc-theme-primary: var(--primary-color);
+    width: 100%;
+}
+
+.mdc-text-field--outlined .mdc-notched-outline__leading,
+.mdc-text-field--outlined .mdc-notched-outline__notch,
+.mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: var(--border) !important;
+}
+
+.mdc-text-field--outlined:hover .mdc-notched-outline__leading,
+.mdc-text-field--outlined:hover .mdc-notched-outline__notch,
+.mdc-text-field--outlined:hover .mdc-notched-outline__trailing {
+    border-color: var(--primary-color) !important;
+}
+
+.mdc-text-field--focused .mdc-notched-outline__leading,
+.mdc-text-field--focused .mdc-notched-outline__notch,
+.mdc-text-field--focused .mdc-notched-outline__trailing {
+    border-color: var(--primary-color) !important;
+    border-width: 2px !important;
+}
+
+.mdc-text-field__input {
+    color: var(--text-primary) !important;
+    background-color: var(--surface) !important;
+    border-radius: var(--border-radius) !important;
+}
+
+.mdc-text-field__input::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Model Selector Specific Styles */
+.model-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--surface-light);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border);
+}
+
+.model-select-wrapper {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Mobile Responsive for Material Components */
+@media (max-width: 768px) {
+    .mdc-button__label {
+        display: none;
+    }
+    
+    .mdc-button__icon {
+        margin-right: 0 !important;
+    }
+    
+    .model-select-wrapper {
+        min-width: 150px;
+    }
+    
+    .mdc-text-field {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
 }
