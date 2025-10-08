@@ -9,6 +9,7 @@ Una interfaz de chat moderna y elegante que se conecta tanto a **Ollama local** 
 
 ## ✨ Características
 
+- 🧙‍♂️ **Wizard de Configuración** - Setup guiado paso a paso para nuevos usuarios
 - 🏠 **Conexión a Ollama Local** - Ejecuta modelos de IA localmente con detección automática
 - 🔄 **Auto-detección de Modelos** - Carga automáticamente todos tus modelos de Ollama instalados
 - 📜 **Auto-Scroll Inteligente** - Scroll automático suave durante las respuestas de IA
@@ -19,7 +20,7 @@ Una interfaz de chat moderna y elegante que se conecta tanto a **Ollama local** 
 - 🚀 **Fácil Deploy** - Compatible con GitHub Pages
 - ⚡ **Vanilla JavaScript** - Sin frameworks pesados, carga rápida
 - 💾 **Historial Local** - Guarda tus conversaciones en el navegador
--  **Notificaciones Elegantes** - SweetAlert2 para mejor UX
+- 🎁 **Notificaciones Elegantes** - SweetAlert2 para mejor UX
 - 📤 **Exportar Conversaciones** - Descarga en formato texto o Markdown
 - 🎯 **Material Icons** - Iconos consistentes y modernos
 - ⌨️ **Atajos de Teclado** - Navegación rápida y eficiente
@@ -60,7 +61,75 @@ npx http-server
 4. Elige la rama `main` y carpeta `/ (root)`
 5. Tu sitio estará disponible en `https://tuusuario.github.io/promptly`
 
-## ⚙️ Configuración
+## 🧙‍♂️ Wizard de Configuración Inicial
+
+**¡Nuevo en v1.1.0!** Promptly ahora incluye un **wizard de configuración guiado** que hace la instalación súper fácil para nuevos usuarios.
+
+### ✨ ¿Qué hace el Wizard?
+
+Cuando abres Promptly por primera vez, aparece automáticamente un wizard elegante que te guía paso a paso:
+
+#### **Paso 1: Bienvenida** 🚀
+
+- Introducción amigable a Promptly
+- Resumen de características principales
+- Explicación de los tipos de proveedores disponibles
+
+#### **Paso 2: Selección de Proveedor** 🎯
+
+- **Ollama Local** - Para ejecutar modelos en tu computadora
+- **APIs Externas** - Para conectar con OpenAI, Anthropic, Groq
+
+#### **Paso 3: Configuración Específica** ⚙️
+
+**Para Ollama Local:**
+
+- Test de conexión en tiempo real a `http://localhost:11434`
+- Detección automática de modelos disponibles
+- Ayuda contextual si hay problemas de conexión
+- Validación de que Ollama esté ejecutándose
+
+**Para APIs Externas:**
+
+- Selección del proveedor (OpenAI, Anthropic, Groq)
+- Entrada segura de API key con validación básica
+- Configuración automática de modelos predeterminados
+
+#### **Paso 4: Finalización** ✅
+
+- Resumen de la configuración guardada
+- Aplicación automática de settings
+- Inicio inmediato de la aplicación
+
+### 🎨 Características del Wizard
+
+- **Interfaz moderna** con backdrop blur y animaciones suaves
+- **Progreso visual** con barra de avance y contador de pasos
+- **Validación en tiempo real** - los botones se habilitan automáticamente cuando la configuración es válida
+- **Responsive** - funciona perfectamente en móviles y desktop
+- **Skip automático** - solo aparece en la primera visita
+- **Configuración instantánea** - al terminar, la app está lista para usar
+
+### 🚀 Cómo Usar el Wizard
+
+1. **Primera visita**: El wizard aparece automáticamente
+2. **Reconfigurar**: Puedes reactivarlo borrando el localStorage:
+
+   ```javascript
+   localStorage.removeItem('promptly_setup_completed');
+   location.reload();
+   ```
+
+3. **Configuración manual**: También puedes usar el panel de configuración tradicional (⚙️)
+
+### 💡 Ventajas del Wizard
+
+- **Para nuevos usuarios**: Configuración sin confusión en menos de 2 minutos
+- **Para usuarios de Ollama**: Test automático de conexión y detección de modelos
+- **Para usuarios de APIs**: Validación de keys y configuración automática
+- **Para todos**: Experiencia más pulida y profesional
+
+## ⚙️ Configuración Manual (Tradicional)
 
 ### Ollama Local
 
@@ -135,6 +204,7 @@ ollama serve
 ## 🔧 Características Técnicas
 
 ### Estructura del Proyecto
+
 ```
 promptly/
 ├── index.html          # Página principal
@@ -142,8 +212,10 @@ promptly/
 │   └── styles.css      # Estilos principales
 ├── js/
 │   ├── config.js       # Configuración y utilidades
+│   ├── utils.js        # Funciones de utilidad
 │   ├── providers.js    # Manejo de proveedores de IA
 │   ├── chat.js         # Lógica del chat
+│   ├── wizard.js       # Wizard de configuración inicial
 │   └── app.js          # Aplicación principal
 └── README.md
 ```
@@ -161,6 +233,19 @@ promptly/
 - Comunicación HTTPS con todos los proveedores externos
 
 ## 📱 Uso
+
+### 🧙‍♂️ Primera Vez (Con Wizard)
+
+**¡Súper fácil!** Si es tu primera vez usando Promptly:
+
+1. **Abre la aplicación** - El wizard aparece automáticamente
+2. **Sigue los 4 pasos** del wizard guiado:
+   - Bienvenida y selección de proveedor
+   - Configuración específica con validación en tiempo real
+   - Resumen y confirmación
+3. **¡Listo!** - La app se configura automáticamente y está lista para usar
+
+### ⚙️ Uso Manual (Configuración Tradicional)
 
 1. **Configura tu proveedor**: Haz clic en el botón "⚙️ Configuración"
 2. **Selecciona el proveedor** que prefieras (Ollama local o API externa)
