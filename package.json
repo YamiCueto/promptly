@@ -4,12 +4,18 @@
   "description": "Una interfaz de chat moderna que se conecta a Ollama local y APIs externas de IA",
   "main": "index.html",
   "scripts": {
-    "start": "npx http-server -c-1 -p 8000",
-    "dev": "npx http-server -c-1 -p 8000 --cors",
-    "build": "echo 'No build step required for vanilla JavaScript project'",
-    "test": "echo 'Tests not implemented yet'",
-    "lint": "echo 'Linting not configured'",
-    "deploy": "echo 'Deploy to GitHub Pages through repository settings'"
+    "start": "npx http-server -c-1 -p 8000 --silent",
+    "dev": "npx http-server -c-1 -p 8000 --cors -o",
+    "build": "npm run validate && echo '✅ Build completed - no compilation needed for vanilla JS'",
+    "test": "npm run validate",
+    "validate": "npm run validate:structure && npm run validate:syntax && npm run validate:html",
+    "validate:structure": "echo '🔍 Validating project structure...' && test -f index.html && test -f css/styles.css && test -d js && echo '✅ Structure OK'",
+    "validate:syntax": "echo '🔍 Validating JavaScript syntax...' && node -c js/config.js && node -c js/providers.js && node -c js/chat.js && node -c js/app.js && echo '✅ Syntax OK'",
+    "validate:html": "echo '🔍 Validating HTML...' && grep -q 'chatMessages' index.html && grep -q 'messageInput' index.html && echo '✅ HTML OK'",
+    "serve": "npm start",
+    "preview": "npm run dev",
+    "deploy": "echo '🚀 Deploy automatically via GitHub Actions on push to main'",
+    "info": "echo '📋 Promptly v1.0.0 - Modern AI Chat Interface' && echo '🏠 Local: http://localhost:8000' && echo '🌐 Demo: https://yamicueto.github.io/promptly'"
   },
   "repository": {
     "type": "git",

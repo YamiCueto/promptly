@@ -1,5 +1,10 @@
 # Promptly 🤖
 
+[![Deploy Status](https://github.com/YamiCueto/promptly/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/YamiCueto/promptly/actions)
+[![CI Status](https://github.com/YamiCueto/promptly/workflows/CI/badge.svg)](https://github.com/YamiCueto/promptly/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/YamiCueto/promptly/releases)
+
 Una interfaz de chat moderna y elegante que se conecta tanto a **Ollama local** como a **APIs externas** de proveedores de IA como OpenAI, Anthropic y Groq.
 
 ## ✨ Características

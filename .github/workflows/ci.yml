@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci --only=dev || npm install --only=dev
+    
+    - name: Lint project
+      run: |
+        echo "🔍 Checking project structure..."
+        # Verificar que existen los archivos principales
+        test -f index.html || (echo "❌ index.html not found" && exit 1)
+        test -f css/styles.css || (echo "❌ styles.css not found" && exit 1)
+        test -f js/app.js || (echo "❌ app.js not found" && exit 1)
+        test -f js/chat.js || (echo "❌ chat.js not found" && exit 1)
+        test -f js/config.js || (echo "❌ config.js not found" && exit 1)
+        test -f js/providers.js || (echo "❌ providers.js not found" && exit 1)
+        echo "✅ All required files exist"
+    
+    - name: Validate HTML
+      run: |
+        echo "🔍 Validating HTML structure..."
+        # Verificar que el HTML tiene la estructura básica
+        grep -q "<!DOCTYPE html>" index.html || (echo "❌ Missing DOCTYPE" && exit 1)
+        grep -q "<title>" index.html || (echo "❌ Missing title" && exit 1)
+        grep -q "chatMessages" index.html || (echo "❌ Missing chat container" && exit 1)
+        grep -q "messageInput" index.html || (echo "❌ Missing message input" && exit 1)
+        echo "✅ HTML structure is valid"
+    
+    - name: Validate JavaScript
+      run: |
+        echo "🔍 Checking JavaScript syntax..."
+        # Verificar sintaxis básica de JavaScript
+        node -c js/config.js || (echo "❌ config.js has syntax errors" && exit 1)
+        node -c js/providers.js || (echo "❌ providers.js has syntax errors" && exit 1)
+        node -c js/chat.js || (echo "❌ chat.js has syntax errors" && exit 1)
+        node -c js/app.js || (echo "❌ app.js has syntax errors" && exit 1)
+        echo "✅ JavaScript syntax is valid"
+    
+    - name: Check CSS
+      run: |
+        echo "🔍 Validating CSS..."
+        # Verificar que el CSS tiene las clases principales
+        grep -q "\.app-container" css/styles.css || (echo "❌ Missing app-container class" && exit 1)
+        grep -q "\.chat-messages" css/styles.css || (echo "❌ Missing chat-messages class" && exit 1)
+        grep -q "\.message-input" css/styles.css || (echo "❌ Missing message-input class" && exit 1)
+        echo "✅ CSS structure is valid"
+    
+    - name: Test local server
+      run: |
+        echo "🚀 Testing local server..."
+        npm start &
+        SERVER_PID=$!
+        sleep 5
+        # Verificar que el servidor responde
+        curl -f http://localhost:8000 > /dev/null || (echo "❌ Server not responding" && exit 1)
+        kill $SERVER_PID
+        echo "✅ Local server works correctly"
+    
+    - name: Check file sizes
+      run: |
+        echo "📊 Checking file sizes..."
+        HTML_SIZE=$(stat -c%s index.html)
+        CSS_SIZE=$(stat -c%s css/styles.css)
+        JS_TOTAL=$(find js -name "*.js" -exec stat -c%s {} \; | awk '{sum+=$1} END {print sum}')
+        
+        echo "📄 HTML: $HTML_SIZE bytes"
+        echo "🎨 CSS: $CSS_SIZE bytes"  
+        echo "⚡ JavaScript: $JS_TOTAL bytes"
+        
+        TOTAL_SIZE=$((HTML_SIZE + CSS_SIZE + JS_TOTAL))
+        echo "📦 Total size: $TOTAL_SIZE bytes"
+        
+        # Verificar que el tamaño total es razonable (< 100KB)
+        if [ $TOTAL_SIZE -gt 102400 ]; then
+          echo "⚠️ Warning: Total size is larger than 100KB"
+        else
+          echo "✅ Total size is optimal"
+        fi
