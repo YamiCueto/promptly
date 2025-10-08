@@ -152,6 +152,18 @@ El deploy es **completamente automático**:
 2. Asegúrate de que esté marcado "Allow all actions and reusable workflows"
 3. Verifica que tengas permisos de escritura en el repositorio
 
+**Si los workflows fallan con errores de npm:**
+
+1. Asegúrate de que existe `package-lock.json` en el repositorio
+2. Si no existe, ejecuta `npm install` localmente y haz commit del archivo
+3. Los workflows están configurados para usar `npm install` (compatible con proyectos vanilla)
+
+**Si aparecen errores de sintaxis en workflows:**
+
+1. Verifica que la indentación YAML sea correcta (usa espacios, no tabs)
+2. Los commits de UNA línea también aplican a mensajes de workflows
+3. Revisa los logs detallados en la pestaña Actions
+
 ## 🔑 Configuración de APIs
 
 ### Ollama Local
