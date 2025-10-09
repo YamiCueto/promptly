@@ -1,0 +1,42 @@
+/* ========================================
+   PROMPTLY - CSS MODULAR
+   Archivo principal que importa todos los módulos
+   ======================================== */
+
+/* 1. Variables y temas */
+@import 'components/variables.css';
+
+/* 2. Reset y base */
+@import 'components/base.css';
+
+/* 3. Layout */
+@import 'components/layout.css';
+
+/* 4. Header y navegación */
+@import 'components/header.css';
+
+/* 5. Botones e iconos */
+@import 'components/buttons.css';
+
+/* 6. Formularios e inputs */
+@import 'components/forms.css';
+
+/* 7. Chat y mensajes */
+@import 'components/chat.css';
+
+/* 8. Componentes específicos por crear */
+/* TODO: Crear estos módulos según se necesiten */
+/* @import 'components/settings.css'; */
+/* @import 'components/wizard.css'; */
+/* @import 'components/code-blocks.css'; */
+/* @import 'components/utilities.css'; */
+
+/* ========================================
+   NOTAS PARA FUTURA MODULARIZACIÓN:
+   
+   - settings.css: Panel de configuración
+   - wizard.css: Wizard de configuración inicial
+   - code-blocks.css: Bloques de código y sintaxis
+   - utilities.css: Clases de utilidad
+   - animations.css: Animaciones y transiciones
+   ======================================== */
