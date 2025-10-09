@@ -49,6 +49,217 @@
     color: var(--text-muted);
 }
 
+/* ========================================
+   CORS WIZARD MODAL
+   ======================================== */
+
+.cors-wizard-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.cors-wizard-content {
+    background: var(--surface);
+    border-radius: var(--border-radius-lg);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+}
+
+.cors-wizard-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-light);
+}
+
+.cors-wizard-header h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.cors-wizard-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--surface-dark);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.progress-text {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.cors-wizard-body {
+    padding: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.cors-wizard-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    background: var(--surface-light);
+}
+
+/* Detection Tests */
+.detection-tests {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.test-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--surface-light);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border);
+}
+
+.test-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.test-status {
+    font-size: 0.875rem;
+    font-family: monospace;
+}
+
+/* Diagnosis Results */
+.diagnosis-good {
+    padding: 1rem;
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: var(--border-radius);
+    color: var(--success-color);
+}
+
+.diagnosis-warning {
+    padding: 1rem;
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: var(--border-radius);
+    color: var(--warning-color);
+}
+
+.diagnosis-error {
+    padding: 1rem;
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: var(--border-radius);
+    color: var(--error-color);
+}
+
+/* Solution Tabs */
+.solution-tabs {
+    margin-top: 1rem;
+}
+
+.tab-buttons {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-btn:hover:not(.active) {
+    color: var(--text-primary);
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.code-block {
+    background: var(--surface-dark);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin: 0.5rem 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.875rem;
+    overflow-x: auto;
+}
+
+.code-block code {
+    background: none;
+    padding: 0;
+    color: var(--text-primary);
+}
+
+/* Verification */
+.success-message {
+    padding: 1rem;
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: var(--border-radius);
+    color: var(--success-color);
+}
+
+.error-message {
+    padding: 1rem;
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: var(--border-radius);
+    color: var(--error-color);
+}
+
 .send-btn {
     background: var(--primary-color);
     border: none;

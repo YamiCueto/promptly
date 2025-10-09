@@ -3,6 +3,7 @@ class AIProviders {
     constructor() {
         this.currentProvider = null;
         this.currentSettings = {};
+        this.corsHandler = new CORSHandler();
     }
     
     // Configurar proveedor actual
@@ -11,10 +12,13 @@ class AIProviders {
         this.currentSettings = settings;
     }
     
-    // Verificar conexión con Ollama
+    // Verificar conexión con Ollama usando CORS handler inteligente
     async checkOllamaConnection(url) {
         try {
-            const response = await fetch(`${url}/api/tags`, {
+            // Intentar detectar estrategia CORS funcional
+            await this.corsHandler.findWorkingStrategy(`${url}/api/tags`);
+            
+            const response = await this.corsHandler.makeRequest(`${url}/api/tags`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -25,7 +29,8 @@ class AIProviders {
                 const data = await response.json();
                 return {
                     success: true,
-                    models: data.models || []
+                    models: data.models || [],
+                    corsStrategy: this.corsHandler.workingStrategy.name
                 };
             }
             
@@ -34,6 +39,16 @@ class AIProviders {
                 error: `Error HTTP: ${response.status}`
             };
         } catch (error) {
+            // Si hay error de CORS, mostrar wizard
+            if (error.message.includes('CORS') || error.message.includes('fetch')) {
+                this.showCORSWizard();
+                return {
+                    success: false,
+                    error: 'Error de CORS detectado',
+                    showWizard: true
+                };
+            }
+            
             return {
                 success: false,
                 error: error.message
@@ -41,10 +56,16 @@ class AIProviders {
         }
     }
     
-    // Obtener modelos de Ollama
+    // Mostrar wizard de CORS
+    async showCORSWizard() {
+        const wizard = new CORSWizard();
+        await wizard.start();
+    }
+    
+    // Obtener modelos de Ollama con CORS handler
     async getOllamaModels(url) {
         try {
-            const response = await fetch(`${url}/api/tags`);
+            const response = await this.corsHandler.makeRequest(`${url}/api/tags`);
             if (response.ok) {
                 const data = await response.json();
                 return data.models.map(model => ({

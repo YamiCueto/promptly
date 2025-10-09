@@ -275,7 +275,7 @@
                     <div class="ollama-help hidden" id="ollamaHelp">
                         <h4>💡 ¿No tienes Ollama instalado?</h4>
                         <ol>
-                            <li>Descarga Ollama desde <a href="https://ollama.ai" target="_blank">ollama.ai</a></li>
+                            <li>Descarga Ollama desde <a rel="noopener noreferrer" href="https://ollama.ai" target="_blank">ollama.ai</a></li>
                             <li>Instálalo en tu sistema</li>
                             <li>Ejecuta: <code>ollama pull llama3.2</code></li>
                             <li>Inicia el servidor: <code>ollama serve</code></li>
@@ -307,15 +307,15 @@
                     <div class="api-links">
                         <h4>🔗 Obtener API Keys:</h4>
                         <div class="link-grid">
-                            <a href="https://platform.openai.com/api-keys" target="_blank" class="api-link">
+                            <a rel="noopener noreferrer" href="https://platform.openai.com/api-keys" target="_blank" class="api-link">
                                 <span class="material-icons">launch</span>
                                 OpenAI API Keys
                             </a>
-                            <a href="https://console.anthropic.com/" target="_blank" class="api-link">
+                            <a rel="noopener noreferrer" href="https://console.anthropic.com/" target="_blank" class="api-link">
                                 <span class="material-icons">launch</span>
                                 Anthropic Console
                             </a>
-                            <a href="https://console.groq.com/keys" target="_blank" class="api-link">
+                            <a rel="noopener noreferrer" href="https://console.groq.com/keys" target="_blank" class="api-link">
                                 <span class="material-icons">launch</span>
                                 Groq API Keys
                             </a>
@@ -365,6 +365,8 @@
     <!-- Scripts -->
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/cors-handler.js"></script>
+    <script src="js/cors-wizard.js"></script>
     <script src="js/providers.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/wizard.js"></script>
