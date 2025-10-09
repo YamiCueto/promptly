@@ -30,6 +30,8 @@ Una interfaz de chat moderna y elegante que se conecta tanto a **Ollama local** 
 Visita: [https://yamicueto.github.io/promptly](https://yamicueto.github.io/promptly)
 
 > **📋 IMPORTANTE**: Para configuración completa, troubleshooting y convenciones de desarrollo, consulta [INSTRUCTIONS.md](INSTRUCTIONS.md)
+> 
+> **🔧 CORS**: Si tienes problemas conectando Ollama desde GitHub Pages, consulta nuestra [Guía de CORS](CORS-GUIDE.md)
 
 ## 🛠️ Instalación Rápida
 

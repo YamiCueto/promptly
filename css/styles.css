@@ -1632,3 +1632,38 @@ pre code {
     font-weight: 600;  
     color: var(--color-text);  
 } 
+  
+/* CORS Help Styles */ 
+.cors-help {  
+    background: #fff3cd;  
+    border: 1px solid #ffeaa7;  
+    border-radius: 8px;  
+    padding: 16px;  
+    margin-top: 12px;  
+} 
+  
+.cors-solution {  
+    margin: 12px 0;  
+    padding: 12px;  
+    background: rgba(255, 255, 255, 0.7);  
+    border-radius: 6px;  
+} 
+  
+.cors-help h4 {  
+    color: #856404;  
+    margin-bottom: 12px;  
+} 
+  
+.cors-help h5 {  
+    color: #664d03;  
+    margin-bottom: 8px;  
+    font-size: 14px;  
+} 
+  
+.cors-help code {  
+    background: #f8f9fa;  
+    padding: 2px 6px;  
+    border-radius: 4px;  
+    font-family: monospace;  
+    font-size: 12px;  
+} 

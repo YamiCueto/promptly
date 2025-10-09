@@ -233,22 +233,84 @@ class SetupWizard {
             if (result.success) {
                 statusElement.className = 'ollama-status connected';
                 statusText.textContent = `✅ Conectado exitosamente (${result.models?.length || 0} modelos disponibles)`;
-                this.elements.ollamaHelp.classList.add('hidden');
+                this.hideOllamaHelp();
                 
                 // Store the URL for later use
                 this.wizardConfig.ollamaUrl = url;
                 this.wizardConfig.ollamaModels = result.models || [];
             } else {
                 this.showOllamaError(`❌ Error: ${result.error}`);
-                this.elements.ollamaHelp.classList.remove('hidden');
+                this.showOllamaHelp();
             }
         } catch (error) {
-            this.showOllamaError(`❌ Error de conexión: ${error.message}`);
-            this.elements.ollamaHelp.classList.remove('hidden');
+            // Detectar errores de CORS específicamente
+            if (error.message.includes('CORS') || 
+                error.message.includes('blocked') || 
+                error.message.includes('Access-Control-Allow-Origin')) {
+                this.showCorsError();
+            } else {
+                this.showOllamaError(`❌ Error de conexión: ${error.message}`);
+                this.showOllamaHelp();
+            }
         }
         
         this.elements.testOllamaBtn.disabled = false;
         this.updateButtons();
+    }
+    
+    showCorsError() {
+        const statusElement = this.elements.ollamaStatus;
+        const statusText = statusElement.querySelector('.status-text');
+        
+        statusElement.className = 'ollama-status error';
+        statusText.innerHTML = `
+            ❌ <strong>Error de CORS detectado</strong><br>
+            <small>GitHub Pages (HTTPS) no puede conectar a localhost (HTTP)</small>
+        `;
+        
+        // Mostrar ayuda específica para CORS
+        this.showCorsHelp();
+    }
+    
+    showCorsHelp() {
+        const helpElement = this.elements.ollamaHelp;
+        helpElement.innerHTML = `
+            <div class="cors-help">
+                <h4>🔧 Soluciones para el Error de CORS:</h4>
+                <div class="cors-solution">
+                    <h5>📋 Opción 1: Configurar Ollama (Recomendado)</h5>
+                    <ol>
+                        <li>Cierra Ollama completamente</li>
+                        <li>Abre CMD como administrador</li>
+                        <li>Ejecuta: <code>setx OLLAMA_ORIGINS "*"</code></li>
+                        <li>Ejecuta: <code>setx OLLAMA_HOST "0.0.0.0:11434"</code></li>
+                        <li>Reinicia tu computadora</li>
+                        <li>Inicia Ollama: <code>ollama serve</code></li>
+                    </ol>
+                </div>
+                <div class="cors-solution">
+                    <h5>🌐 Opción 2: Usar Proxy HTTPS</h5>
+                    <ol>
+                        <li>Instala ngrok: <a href="https://ngrok.com/download" target="_blank">ngrok.com/download</a></li>
+                        <li>Ejecuta: <code>ngrok http 11434</code></li>
+                        <li>Usa la URL HTTPS que te da ngrok</li>
+                    </ol>
+                </div>
+                <div class="cors-solution">
+                    <h5>💻 Opción 3: Usar Localmente</h5>
+                    <p>Ejecuta Promptly desde tu computadora con un servidor local para evitar CORS.</p>
+                </div>
+            </div>
+        `;
+        helpElement.classList.remove('hidden');
+    }
+    
+    showOllamaHelp() {
+        this.elements.ollamaHelp.classList.remove('hidden');
+    }
+    
+    hideOllamaHelp() {
+        this.elements.ollamaHelp.classList.add('hidden');
     }
     
     showOllamaError(message) {
