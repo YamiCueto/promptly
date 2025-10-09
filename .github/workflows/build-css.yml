@@ -1,0 +1,87 @@
+name: Build CSS
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: 
+      - 'css/components/**'
+      - 'build-css.js'
+      - 'package.json'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'css/components/**'
+      - 'build-css.js'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  build-css:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build CSS from modules
+        run: |
+          echo "🔨 Building CSS from modular components..."
+          npm run build:css
+          
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if [ -n "$(git status --porcelain css/styles-combined.css css/styles-combined.min.css)" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "📝 CSS files have been updated"
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "✅ CSS files are up to date"
+          fi
+          
+      - name: Show CSS stats
+        run: |
+          echo "📊 CSS Build Statistics:"
+          echo "Combined CSS: $(wc -c < css/styles-combined.css | tr -d ' ') bytes"
+          echo "Minified CSS: $(wc -c < css/styles-combined.min.css | tr -d ' ') bytes"
+          echo "Modules processed: $(ls css/components/*.css | wc -l)"
+          
+          # Calculate compression ratio
+          original_size=$(wc -c < css/styles-combined.css | tr -d ' ')
+          minified_size=$(wc -c < css/styles-combined.min.css | tr -d ' ')
+          if [ $original_size -gt 0 ]; then
+            reduction=$(( (original_size - minified_size) * 100 / original_size ))
+            echo "Compression: ${reduction}% reduction"
+          fi
+          
+      - name: Commit updated CSS (if needed)
+        if: steps.verify-changed-files.outputs.changes == 'true' && github.event_name == 'push'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add css/styles-combined.css css/styles-combined.min.css
+          git commit -m "🎨 Auto-build CSS from modules [skip ci]" || exit 0
+          git push
+          
+      - name: Validate build
+        run: |
+          npm run validate
+          echo "✅ Build validation completed"
+          
+      - name: Upload CSS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-css
+          path: |
+            css/styles-combined.css
+            css/styles-combined.min.css
+          retention-days: 7

@@ -38,13 +38,32 @@ jobs:
 
       - name: Build project
         run: |
-          echo "Building Promptly v1.0.0"
-          # Para un proyecto vanilla JS, solo necesitamos copiar archivos
+          echo "🔨 Building Promptly v2.0.0 with CSS compilation"
+          
+          # Compilar CSS desde módulos
+          echo "📦 Compiling CSS modules..."
+          npm run build:css
+          
+          # Validar build
+          echo "✅ Validating build..."
+          npm run validate
+          
+          # Crear directorio dist
           mkdir -p dist
+          
+          # Copiar archivos necesarios
+          echo "📁 Copying files to dist..."
           cp -r *.html *.ico *.json css js dist/
-          # Crear un .nojekyll para GitHub Pages
+          
+          # Crear .nojekyll para GitHub Pages
           touch dist/.nojekyll
-          echo "Build completed successfully"
+          
+          # Mostrar estadísticas del build
+          echo "📊 Build statistics:"
+          echo "CSS combined: $(wc -c < css/styles-combined.css) bytes"
+          echo "CSS minified: $(wc -c < css/styles-combined.min.css) bytes"
+          
+          echo "✅ Build completed successfully"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
