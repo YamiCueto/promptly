@@ -11,6 +11,7 @@ const cssModules = [
     'components/header.css',
     'components/buttons.css',
     'components/forms.css',
+    'components/wizard.css',
     'components/chat.css'
 ];
 
@@ -46,11 +47,14 @@ console.log('✅ CSS combinado generado: css/styles-combined.css');
 console.log(`📏 Tamaño: ${(fs.statSync(outputPath).size / 1024).toFixed(2)} KB`);
 console.log(`📄 Líneas: ${combinedCSS.split('\n').length}`);
 
-// Opcional: Minificar (básico)
+// Opcional: Minificar (menos agresivo para debugging)
 const minified = combinedCSS
     .replace(/\/\*[\s\S]*?\*\//g, '') // Remover comentarios
-    .replace(/\s+/g, ' ') // Colapsar espacios
+    .replace(/\s+/g, ' ') // Colapsar espacios múltiples
     .replace(/;\s*}/g, '}') // Remover ; antes de }
+    .replace(/\s*{\s*/g, '{') // Limpiar espacios alrededor de {
+    .replace(/\s*}\s*/g, '}\n') // Añadir salto de línea después de }
+    .replace(/,\s*/g, ',') // Limpiar espacios después de comas
     .trim();
 
 const minifiedPath = path.join(__dirname, 'css', 'styles-combined.min.css');
